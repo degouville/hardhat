@@ -56,7 +56,14 @@ export class ForkBlockchain implements HardhatBlockchainInterface {
       return block ?? null;
     }
 
-    block = await this._getBlockByNumber(new BN(blockHashOrNumber));
+    const blockNumber = new BN(blockHashOrNumber);
+    if (this._data.splitAnyEmptyBlockRangesFor(blockNumber)) {
+      await this.addBlock(
+        Block.fromBlockData({ header: { number: blockNumber.toNumber() } })
+      );
+    }
+
+    block = await this._getBlockByNumber(new BN(blockNumber));
     return block ?? null;
   }
 
